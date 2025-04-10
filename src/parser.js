@@ -21,20 +21,22 @@ function parseStatusMessage(buffer) {
 		// ...expand as you decode more
 	}
 
-    const command = commandMap[commandCode] || `unknown_0x${commandCode.toString(16)}`
+    const Command = commandMap[commandCode] || `unknown_0x${commandCode.toString(16)}`
 
 	const portType = buffer[3] === 0x04 ? 'input' :
 	                 buffer[3] === 0x05 ? 'output' : 'unknown'
 
-	const port = buffer[4]
+	const statusport = buffer[4]
 	const statusByte = buffer[6]
-	const connected = statusByte !== 0xFF
+	const statusconnected = statusByte !== 0xFF
+
 
 	return {
+        feedback: 'PortStatus',
 		type: portType,
-        command,
-		port,
-		connected,
+        command: Command,
+		port: statusport,
+		connected: statusconnected,
 		rawStatus: statusByte
 	}
 }

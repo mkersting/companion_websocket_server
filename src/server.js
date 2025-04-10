@@ -22,14 +22,33 @@ wss.on('connection', (ws) => {
     console.log('Received from Companion:', parsed)
     console.log('Constructed RS232 Message:', rs232)
     //Log message
-		
+
+		let parsedresponse = null
 
     const response = simulateDeviceResponse(rs232)
     if (response) {
-      const parsed = parser.parseStatusMessage(response)
+      const parsedresponse = parser.parseStatusMessage(response)
       console.log('Simulated response:', response)
-      console.log('Parsed simulated status reply:', parsed)
+      console.log('Parsed simulated status reply:', parsedresponse)
+
+      if (parsedresponse && parsedresponse.command === 'status_reply') {
+  
+        // Send Answer Back to Companion
+      console.log ('Inside if statement')
+  
+        ws.send(JSON.stringify({
+          feedback: 'PortStatus',
+          type: parsedresponse.type,
+          port: parsedresponse.port,
+          connected: parsedresponse.connected,
+        }))
+      }
+
+
+
     }
+
+    
 
     // Switch TO rs232Builder and Build Message
 
