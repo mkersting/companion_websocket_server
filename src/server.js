@@ -26,7 +26,7 @@ wss.on('connection', (ws) => {
 
     const response = simulateDeviceResponse(rs232)
     if (response) {
-      const parsed = parser.parseStatusResponse(response)
+      const parsed = parser.parseStatusMessage(response)
       console.log('Simulated response:', response)
       console.log('Parsed simulated status reply:', parsed)
     }

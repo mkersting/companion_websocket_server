@@ -2,7 +2,7 @@
 
 const { calculateChecksum } = require('./checksum')
 
-function buildRs232Message({ command, input, output }) {
+function buildRs232Message({ command, fromport, toport, port , type}) {
 	const message = Buffer.alloc(13, 0x00)
 
 	message[0] = 0xA5
@@ -10,14 +10,13 @@ function buildRs232Message({ command, input, output }) {
 
 	if (command === 'switch') {
 		message[2] = 0x02 // "switch" command
-		message[3] = 0x05 // 05 = output (we are switching output)
-		message[4] = output || 0x00
-		message[5] = input || 0x00
+		message[3] = toport // 05 = output (we are switching output)
+		message[4] = fromport
 	}
     else if (command === 'status') {
 		message[2] = 0x01          // command: get status
-		message[3] = 0x04          // 04 = input? (based on your notes)
-		message[4] = output // You said 01 = output 1
+		message[3] = type === 'input' ? 0x04 : 0x05 // input/output flag
+		message[4] = port // You said 01 = output 1
 	}
 
 	// Fill bytes 6-11 with 0x00 (already done via Buffer.alloc)

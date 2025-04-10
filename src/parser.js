@@ -1,39 +1,44 @@
 // parser.js
-//Parse incoming Websocket Messages
+// Parse incoming RS232 responses from the device
 
+function parseStatusMessage(buffer) {
+	if (!buffer || buffer.length < 13) return null
 
-// Create RS232 Messages for Device Communication
+    // Validate start bytes: A5 5B
+	if (buffer[0] !== 0xA5 || buffer[1] !== 0x5B) {
+		return null
+	}
+
+    const commandCode = buffer[2] // Byte 3: Command code
+
+    // Map known command codes to labels
+	const commandMap = {
+		0x01: 'status_reply',
+		0x02: 'switch_ack',
+		0x03: 'edid_set_ack',
+		0x04: 'edid_copy_ack',
+		0x05: 'factory_reset_ack',
+		// ...expand as you decode more
+	}
+
+    const command = commandMap[commandCode] || `unknown_0x${commandCode.toString(16)}`
+
+	const portType = buffer[3] === 0x04 ? 'input' :
+	                 buffer[3] === 0x05 ? 'output' : 'unknown'
+
+	const port = buffer[4]
+	const statusByte = buffer[6]
+	const connected = statusByte !== 0xFF
+
+	return {
+		type: portType,
+        command,
+		port,
+		connected,
+		rawStatus: statusByte
+	}
+}
+
 module.exports = {
-    createRS232Message: function (order, inputOutput, port,) {
-        // Basic RS232 Message Structure
-        const message = [
-            0xA5, // First Byte
-            0x5B, // Second Byte
-            order, // Third Byte: 01 for status, 02 for switch output, etc.
-            inputOutput, // Fourth Byte: 04 for input, 05 for output
-            port, // Fifth Byte: Port number (01 to 04, or 00 for all ports)
-            0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 // Bytes 6-12 (always 00)
-        ];
-
-        // Calculate checksum (13th byte)
-        const checksum = this.calculateChecksum(message);
-        message.push(checksum); // Add checksum byte
-
-        return message;
-    },
-
-    calculateChecksum: function (message) {
-        let sum = message.reduce((acc, byte) => acc + byte, 0);
-        return 0xFF - (sum & 0xFF); // 13th byte checksum
-    },
-
-    parseStatusResponse: function (data) {
-        // Example: parse received status message
-        const inputStatus = data[6]; // Position of the input status (FF means disconnected)
-        const inputPort = data[4]; // Input port (04)
-        return {
-            inputPort,
-            inputStatus
-        };
-    }
-};
+	parseStatusMessage
+}
