@@ -20,7 +20,7 @@ function simulateDeviceResponse(requestBuffer) {
 		response[3] = type
 		response[4] = port
 		response[5] = 0x00
-		response[6] = 0xFF       // Status byte: simulate "Not Connected" 0x00 = Connected
+		response[6] = 0x00       // Status byte: simulate "Not Connected" 0x00 = Connected
 
 		// Bytes 7–11 are already 0x00
 
