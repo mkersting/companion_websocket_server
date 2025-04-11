@@ -34,7 +34,27 @@ function simulateDeviceResponse(requestBuffer) {
 		return response
 	}
 
-	return null
+	else if (requestBuffer[2] === 0x02) {
+
+		response[2] = 0x02 // Echo command
+		response[3] = requestBuffer[3] //Echo Output Port
+		response[4] = 0x00
+		response[5] = 0x00
+		response[6] = requestBuffer[6] // Echo Fixed flag/step
+		response[7] = 0x00
+		response[8] = 0x00
+		response[9] = 0x00
+		response[10] = 0x00
+		response[11] = 0x00
+		response[12] = calculateChecksum(response)
+
+		return response
+	}
+
+	else {
+		return null
+	}
+
 }
 
 module.exports = { simulateDeviceResponse }
