@@ -1,0 +1,82 @@
+/* styles.css */
+
+body {
+    background-color: #1e1e1e;
+    color: #ffffff;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    margin: 0;
+    padding: 2rem;
+  }
+  
+  h1, h2, h3 {
+    color: #ffffff;
+  }
+  
+  .status {
+    background-color: #2d2d2d;
+    padding: 1rem;
+    border-radius: 8px;
+    color: #0f0;
+    font-weight: bold;
+    display: inline-block;
+    margin-top: 1rem;
+  }
+  
+  label, input, select {
+    display: block;
+    margin-top: 1rem;
+    color: #fff;
+  }
+  
+  input, select {
+    background-color: #2a2a2a;
+    border: 1px solid #444;
+    color: #fff;
+    padding: 0.5rem;
+    border-radius: 4px;
+    width: 300px;
+  }
+  
+  button {
+    margin-top: 1rem;
+    padding: 0.5rem 1rem;
+    background-color: #333;
+    color: #fff;
+    border: 1px solid #555;
+    border-radius: 4px;
+    cursor: pointer;
+  }
+  
+  button:hover {
+    background-color: #444;
+  }
+
+  .status-container {
+    margin-bottom: 2rem;
+  }
+  
+  .status.connected {
+    background-color: #2e7d32;
+    color: #ffffff;
+  }
+  
+  .status.disconnected {
+    background-color: #c62828;
+    color: #ffffff;
+  }
+  
+  .log-container {
+    background-color: #121212;
+    border: 1px solid #333;
+    border-radius: 8px;
+    padding: 1rem;
+    max-height: 300px;
+    overflow-y: auto;
+  }
+  
+  .log-output {
+    font-family: monospace;
+    font-size: 0.9rem;
+    color: #00ffcc;
+    white-space: pre-wrap;
+  }
