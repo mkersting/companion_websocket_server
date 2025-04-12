@@ -48,7 +48,7 @@ wss.on('connection', (ws) => {
 
           ws.send(JSON.stringify({
             feedback: 'PortStatus',
-            type: parsedresponse.type,
+            direction: parsedresponse.direction,
             port: parsedresponse.port,
             connected: parsedresponse.connected,
           }))

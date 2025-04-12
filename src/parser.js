@@ -46,7 +46,7 @@ function parseStatusMessage(buffer) {
 
 	return {
 		feedback: 'PortStatus',
-		type: portType,
+		direction: portType,
 		port: statusport,
 		connected: statusconnected,
 		rawStatus: statusByte
