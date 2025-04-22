@@ -11,7 +11,7 @@ const globalRoutingStatus = {} // Store current input per output port
 //For Website configuration
 const guiClients = new Set()
 
-// ✅ Broadcast log messages to connected GUI clients
+// Broadcast log messages to connected GUI clients
 function broadcastToGUI(logMessage) {
   for (const client of guiClients) {
     if (client.readyState === WebSocket.OPEN) {
@@ -51,9 +51,12 @@ wss.on('connection', (ws) => {
         if (parsed.msgtype === 'gui') {
           guiClients.add(ws)
           ws.isGUI = true
+          console.log('GUI Client connected');
           ws.send(JSON.stringify({ type: 'status', connected: true }))
           return
         }
+        
+        console.log('Companion Client connected');
 
         // Log to GUI
         broadcastToGUI(`Received from Companion: ${JSON.stringify(parsed)}`)
@@ -136,9 +139,14 @@ wss.on('connection', (ws) => {
 
     if (ws.isGUI) {
       guiClients.delete(ws);
+      console.log('GUI Client disconnected')
     }
-    console.log('Client disconnected');
+    console.log('Companion Client disconnected');
 
+  });
+
+  ws.on('error', (err) => {
+    console.error('⚡ WebSocket error:', err.message);
   });
 });
 

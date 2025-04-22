@@ -8,3 +8,17 @@ ws.onopen = () => {
 ws.onclose = () => {
   statusSpan.textContent = 'Disconnected';
 };
+
+document.getElementById('reconnect-button').addEventListener('click', () => {
+  connectWebSocket(); // reconnect logic
+});
+
+document.getElementById('disconnect-button').addEventListener('click', () => {
+  connectWebSocket(); // reconnect logic
+});
+
+setInterval(() => {
+  if (socket.readyState === WebSocket.OPEN) {
+    socket.send(JSON.stringify({ msgtype: 'gui', command: 'statuscheck' }));
+  }
+}, 30000); // every 30 seconds
