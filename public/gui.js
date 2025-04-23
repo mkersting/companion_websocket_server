@@ -10,11 +10,19 @@ ws.onclose = () => {
 };
 
 document.getElementById('reconnect-button').addEventListener('click', () => {
-  connectWebSocket(); // reconnect logic
+  appendLog('[GUI] Attempting to reconnect WebSocket...')
+  if (socket && socket.readyState !== WebSocket.CLOSED) {
+    socket.close()
+  }
+  setTimeout(initWebSocket, 100)
 });
 
 document.getElementById('disconnect-button').addEventListener('click', () => {
-  connectWebSocket(); // reconnect logic
+  appendLog('[GUI] Disconnecting WebSocket...')
+  if (socket && socket.readyState === WebSocket.OPEN) {
+    socket.close()
+    updateStatusIndicator(false)
+  }
 });
 
 setInterval(() => {

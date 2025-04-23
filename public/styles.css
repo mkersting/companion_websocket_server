@@ -80,3 +80,8 @@ body {
     color: #00ffcc;
     white-space: pre-wrap;
   }
+
+  .server-controls {
+    margin-bottom: 2rem;
+    color: #ffffff;
+  }
