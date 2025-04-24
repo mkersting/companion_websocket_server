@@ -10,6 +10,7 @@ const treeKill = require('tree-kill')   // Required for killing the server proce
 
 // Init
 let serverProcess = null
+let guiServerProcess = null
 let isRestarting = false
 
 
@@ -71,6 +72,28 @@ function restartServerGracefully() {
     })
 }
 
+
+// GUISERVER STARTUP
+
+function startGuiServer() {
+    if (guiServerProcess) return
+  
+    console.log('[Watcher] Starting GUI server...')
+    guiServerProcess = spawn('node', [path.join(__dirname, 'gui-server.js')], {
+      stdio: 'inherit',
+      shell: true,
+    })
+  
+    guiServerProcess.on('exit', (code) => {
+      console.log(`[Watcher] GUI server exited with code ${code}`)
+      guiServerProcess = null
+    })
+  }
+
+
+
+//ACTUAL CODE STARTS HERE
+
 // Watch all source files except GUI files
 //const watcher = chokidar.watch(['./src/**/*.js'], {
     const watcher = chokidar.watch(`${__dirname}`, {
@@ -84,8 +107,13 @@ watcher.on('change', (path) => {
   restartServerGracefully()
 })
 
+
+
+
 // Event listener for file addition
 console.log('[Watcher] Watching for changes...')
 
 // Actually Start the Server
 startServer()
+// Start the GUI server
+startGuiServer()

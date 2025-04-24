@@ -1,8 +1,9 @@
 {
   "name": "companion_websocket_server",
   "version": "1.0.0",
-  "main": "index.js",
+  "main": "main.js",
   "scripts": {
+    "start": "electron electron-main.js",
     "test": "echo \"Error: no test specified\"",
     "dev": "node src/watcher.js"
   },
@@ -15,5 +16,8 @@
     "express": "^5.1.0",
     "tree-kill": "^1.2.2",
     "ws": "^8.18.1"
+  },
+  "devDependencies": {
+    "electron": "^35.2.1"
   }
 }
