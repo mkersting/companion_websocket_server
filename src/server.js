@@ -12,10 +12,10 @@ const globalRoutingStatus = {} // Store current input per output port
 const guiClients = new Set()
 
 // Broadcast log messages to connected GUI clients
-function broadcastToGUI(logMessage) {
+function broadcastToGUI({logMessage, logtype = 'log-debug' }) {
   for (const client of guiClients) {
     if (client.readyState === WebSocket.OPEN) {
-      client.send(JSON.stringify({ type: 'log', message: logMessage }))
+      client.send(JSON.stringify({ type: 'log', message: logMessage ,logtype}))
     }
   }
 }
@@ -24,27 +24,13 @@ function broadcastToGUI(logMessage) {
 const wss = new WebSocket.Server({ port: 15809 });
 
 wss.on('connection', (ws) => {
-  console.log('Client connected');
+
+  //console.log('Some Client connected');
 
   ws.on('message', (data) => {
     //console.log(`Received message: ${data}`);
     try {
 
-      //const messagefromserver = JSON.parse(data)
-
-      //// Identify client type
-      //if (messagefromserver.msgtype === 'gui') {
-      //  guiClients.add(ws)
-      //  ws.isGUI = true
-      //  ws.send(JSON.stringify({ type: 'status', connected: true }))
-      //  return
-      //} }
-
-
-      //broadcastToGUI(`Received from Companion: ${JSON.stringify(data)}`)
-      // Log received message and prepare to send commands to the device
-
-      
         const parsed = JSON.parse(data.toString())
         //const parsed = JSON.parse(data)
 
@@ -55,11 +41,23 @@ wss.on('connection', (ws) => {
           ws.send(JSON.stringify({ type: 'status', connected: true }))
           return
         }
+        else if (parsed.msgtype === 'companion') {
+
+          console.log('Companion Client connected');
+          ws.isGUI = false
+        }
+        else 
+        {
+          console.log('Unknown Client connected');
+        }
         
-        console.log('Companion Client connected');
 
         // Log to GUI
-        broadcastToGUI(`Received from Companion: ${JSON.stringify(parsed)}`)
+        //broadcastToGUI({message: `Received from Companion: ${JSON.stringify(parsed)}`,logtype: `log-from-companion`})
+        //broadcastToGUI({
+        //  logMessage: `Received from Companion: ${JSON.stringify(parsed)}`,
+        //  logtype: 'log-from-companion'
+        //})
 
 
         const rs232 = buildRs232Message(parsed)
@@ -71,13 +69,19 @@ wss.on('connection', (ws) => {
 
           // Save routing info directly from the message
           if (parsed.command === 'switch') {
-            //ws.routingStatus = ws.routingStatus || {}
-            //ws.routingStatus[parsed.output] = parsed.input
             globalRoutingStatus[parsed.output] = parsed.input
           }
 
           console.log('Received from Companion:', parsed)
+          broadcastToGUI({logMessage:`Received from Companion: ${JSON.stringify(parsed)}`, logtype: 'log-from-companion'})
+
           console.log('Constructed RS232 Message:', rs232)
+
+          const hexFormatted = Array.from(rs232)
+  .map(byte => byte.toString(16).padStart(2, '0').toUpperCase())
+  .join(' ')
+          broadcastToGUI({logMessage:`Constructed RS232 Message: ${hexFormatted}`, logtype: 'log-to-rs232'})
+
           //Log message
 
           let parsedresponse = null
@@ -85,8 +89,17 @@ wss.on('connection', (ws) => {
           const response = simulateDeviceResponse(rs232)
           if (response) {
             parsedresponse = parser.parseStatusMessage(response)
+
             console.log('Simulated response:', response)
+
+            const hexFormattedresponse = Array.from(response)
+  .map(byte => byte.toString(16).padStart(2, '0').toUpperCase())
+  .join(' ')
+
+            broadcastToGUI({logMessage:`Simulated response: ${hexFormattedresponse}`, logtype:'log-from-rs232'})
+
             console.log('Parsed simulated status reply:', parsedresponse)
+            broadcastToGUI({logMessage: `Parsed simulated status reply: ${JSON.stringify(parsedresponse)}`, logtype: 'log-to-companion'})
 
             if (parsedresponse && parsedresponse.feedback === 'PortStatus') {
 
@@ -110,12 +123,6 @@ wss.on('connection', (ws) => {
                 feedback: 'PortRoutingDisplay',
                 port: parsedresponse.output,
                 input,
-
-
-                //ws.send(JSON.stringify({
-                //  command: 'switch_ack',
-                // input: parsed.input,
-                // output: parsed.output,
               }))
 
             }
@@ -124,14 +131,13 @@ wss.on('connection', (ws) => {
             }
           }
 
-
         }
         // Switch TO rs232Builder and Build Message
 
         // Later, you’ll convert this to an RS232 command
       } catch (e) {
         console.error('Invalid message from Companion:', data, '\nError:', e)
-        broadcastToGUI(`Error: ${e.message}`)
+        broadcastToGUI({message:`Error: ${e.message}`, logtype: `log-debug`})
       }
     });
 
@@ -141,12 +147,17 @@ wss.on('connection', (ws) => {
       guiClients.delete(ws);
       console.log('GUI Client disconnected')
     }
-    console.log('Companion Client disconnected');
+    else {
+      console.log('Companion Client disconnected');
+    }
+    
 
   });
 
   ws.on('error', (err) => {
-    console.error('⚡ WebSocket error:', err.message);
+    console.error('WebSocket error:', err.message);
+
+
   });
 });
 

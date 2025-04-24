@@ -1,32 +1,23 @@
-const ws = new WebSocket('ws://localhost:15809');
-const statusSpan = document.getElementById('status');
+// gui.js BEGIN
 
-ws.onopen = () => {
-  statusSpan.textContent = 'Connected';
-};
+//document.getElementById('reconnect-button').addEventListener('click', () => {
+//  if (typeof guiSocket !== 'undefined' && guiSocket.readyState === WebSocket.OPEN) {
+//    guiSocket.send(JSON.stringify({ type: 'control', action: 'reconnect' }))
+//    appendLog('[GUI] Sent reconnect command')
+//  } else {
+//    appendLog('[GUI] WebSocket is not open. Cannot send reconnect command.')
+//  }
+//})
 
-ws.onclose = () => {
-  statusSpan.textContent = 'Disconnected';
-};
+//document.getElementById('disconnect-button').addEventListener('click', () => {
+//  if (typeof guiSocket !== 'undefined' && guiSocket.readyState === WebSocket.OPEN) {
+//    guiSocket.send(JSON.stringify({ type: 'control', action: 'disconnect' }))
+//    appendLog('[GUI] Sent disconnect command')
+  //
+  // } else {
+    //appendLog('[GUI] WebSocket is not open. Cannot send disconnect command.')
+  //}
+//})
 
-document.getElementById('reconnect-button').addEventListener('click', () => {
-  appendLog('[GUI] Attempting to reconnect WebSocket...')
-  if (socket && socket.readyState !== WebSocket.CLOSED) {
-    socket.close()
-  }
-  setTimeout(initWebSocket, 100)
-});
 
-document.getElementById('disconnect-button').addEventListener('click', () => {
-  appendLog('[GUI] Disconnecting WebSocket...')
-  if (socket && socket.readyState === WebSocket.OPEN) {
-    socket.close()
-    updateStatusIndicator(false)
-  }
-});
-
-setInterval(() => {
-  if (socket.readyState === WebSocket.OPEN) {
-    socket.send(JSON.stringify({ msgtype: 'gui', command: 'statuscheck' }));
-  }
-}, 30000); // every 30 seconds
+//GUI.js END

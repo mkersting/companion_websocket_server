@@ -1,30 +1,53 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Companion WebSocket Server GUI</title>
   <link rel="stylesheet" href="styles.css" />
 </head>
-<body>
-  <h1>Server GUI</h1>
 
-  <div class="status-container">
-    <h2>Connection Status</h2>
-    <div id="connection-status" class="status disconnected">DISCONNECTED</div>
+<body>
+
+  <div class="header-top">
+    <h1>Server GUI <span id="server-address" class="server-address"></span></h1>
   </div>
 
-  <div class="server-controls">
-  <button id="reconnect-button">Reconnect</button>
-  <button id="disconnect-button">Disconnect</button>
-</div>
-  
-  <div class="log-container">
-    <h2>Server Log</h2>
+
+  <div class="header-controls">
+
+
+    <div class="status-container">
+      <span id="connection-status" class="status disconnected">DISCONNECTED</span>
+    </div>
+
+    <div class="server-controls">
+      <button id="connect-button">Reconnect</button>
+      <button id="disconnect-button">Disconnect</button>
+    </div>
+
+    
+  </div>
+
+  <div id="log-filters">
+      <button class="filter-btn" data-filter="log-gui" style="background-color: dodgerblue;">GUI</button>
+      <button class="filter-btn" data-filter="log-from-companion" style="background-color: darkorange;">From Companion</button>
+      <button class="filter-btn" data-filter="log-to-companion" style="background-color: lightsalmon;">To Companion</button>
+      <button class="filter-btn" data-filter="log-from-rs232" style="background-color: mediumpurple;">From RS232</button>
+      <button class="filter-btn" data-filter="log-to-rs232" style="background-color: indigo;">To RS232</button>
+      <button class="filter-btn" data-filter="log-debug" style="background-color: gray;">Debug</button>
+      <button id="clear-log-button">Clear Log</button>
+    </div>
+
+    
+
+  <div id ="logContainer" class="logContainer">
     <pre id="log-output" class="log-output"></pre>
   </div>
-  
+
   <script src="socket-status.js"></script>
   <script src="gui.js"></script>
 </body>
+
 </html>
