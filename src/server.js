@@ -16,6 +16,27 @@ const companionClients = new Set()
 
 let isCompanionConnected = false
 
+function sleep(ms) {
+  return new Promise(resolve => setTimeout(resolve, ms))
+}
+
+async function startupSequence() {
+console.log('Server Starting...')
+  await sleep(500)
+  console.log('Server Starting...1')
+  await sleep(500)
+  console.log('Server Starting...2')
+  await sleep(500)
+  console.log('Server Starting...3')
+  await sleep(500)
+  console.log('Server Starting...4')
+  //await sleep(500)
+  //console.log('Server Starting...5')
+}
+
+startupSequence()
+
+
 // Broadcast log messages to connected GUI clients
 function broadcastToGUI({ logMessage, logtype = 'log-debug', raw = null }) {
   for (const client of guiClients) {
@@ -55,7 +76,7 @@ wss.on('connection', (ws) => {
 
         // Send current Companion connection status to GUI
         const isCompanionConnected = companionClients.size > 0
-        console.log(isCompanionConnected);
+        //console.log(isCompanionConnected);
         broadcastToGUI({ raw: { type: 'companion_status', connected: isCompanionConnected } })
 
         return
@@ -63,9 +84,9 @@ wss.on('connection', (ws) => {
       else if (parsed.msgtype === 'companion') {
 
         companionClients.add(ws)
+
         if(parsed.status =='connected'){
           console.log('Companion Client connected');
-          //broadcastToGUI({ logMessage: '[123123] Companion Connected', logtype: 'log-gui' })
         }
         
         ws.isGUI = false
@@ -76,15 +97,6 @@ wss.on('connection', (ws) => {
       else {
         console.log('Unknown Client connected');
       }
-
-
-      // Log to GUI
-      //broadcastToGUI({message: `Received from Companion: ${JSON.stringify(parsed)}`,logtype: `log-from-companion`})
-      //broadcastToGUI({
-      //  logMessage: `Received from Companion: ${JSON.stringify(parsed)}`,
-      //  logtype: 'log-from-companion'
-      //})
-
 
       const rs232 = buildRs232Message(parsed)
 
