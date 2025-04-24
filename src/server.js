@@ -34,9 +34,6 @@ console.log('Server Starting...')
   //console.log('Server Starting...5')
 }
 
-startupSequence()
-
-
 // Broadcast log messages to connected GUI clients
 function broadcastToGUI({ logMessage, logtype = 'log-debug', raw = null }) {
   for (const client of guiClients) {
@@ -51,6 +48,13 @@ function broadcastToGUI({ logMessage, logtype = 'log-debug', raw = null }) {
     }
   }
 }
+
+async function main() {
+  await startupSequence()
+
+  console.log('Startup...1')
+console.log('Startup...2')
+console.log('Startup...3')
 
 // Create WebSocket server
 const wss = new WebSocket.Server({ port: 15809 });
@@ -202,3 +206,7 @@ wss.on('connection', (ws) => {
 });
 
 console.log('WebSocket server running on ws://localhost:15809');
+
+}
+
+main()
