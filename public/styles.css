@@ -90,13 +90,6 @@ body {
     margin-bottom: 15px;
   }
 
-  .log-output {
-    font-family: monospace;
-    font-size: 0.9rem;
-    color: #00ffcc;
-    white-space: pre-wrap;
-  }
-
   #logContainer {
     height: 450px;
     overflow-y: auto;
