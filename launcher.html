@@ -1,0 +1,69 @@
+<!-- // // launcher.html (used for the Electron launcher window) //-->
+<!DOCTYPE html>
+<html lang="en">
+
+
+<head>
+    <meta charset="UTF-8">
+    <title>Companion Lindy Bridge</title>
+    <link rel="stylesheet" href="launcher.css" >
+
+<!-- Script to Open Window for GUI-->
+<script>
+
+    function launchGUI() {
+        require('electron').shell.openExternal('http://localhost:3000')
+    }
+</script>
+<!--  Close Button Script  -->
+<script>
+    function closeApp() {
+        window.electronAPI.closeApp()
+    }
+</script>
+
+<script>
+window.electronAPI.updateStatus((_event, data) => {
+  const el = document.getElementById(`${data.type}-status`)
+  el.textContent = data.connected ? 'Connected' : 'Disconnected'
+  el.classList.remove('connected', 'disconnected')
+  el.classList.add(data.connected ? 'connected' : 'disconnected')
+})
+
+</script>
+<!-- Script END-->
+
+</head>
+
+<body>
+    <div class="logo-container">
+        <div class="logo-background">
+            <img src="assets/lindy_logo.png" alt="Lindy Logo">
+        </div>
+    </div>
+    <div class="main-content">
+        <h1 class="title">Companion Lindy Bridge</h1>
+
+        <div class="status-grid">
+            <div class="status-label">GUI:</div>
+            <div id="gui-status" class="status-value">Disconnected</div>
+
+            <div class="status-label">Companion:</div>
+            <div id="companion-status" class="status-value">Disconnected</div>
+
+            <div class="status-label">RS232:</div>
+            <div id="rs232-status" class="status-value">Disconnected</div>
+        </div>
+
+        <div class="product-link">
+            <a href="https://www.lindy-international.com/" target="_blank">Visit Lindy Website</a>
+        </div>
+
+        <div class="bottom-buttons">
+            <button onclick="electronAPI.launchGui()" id="launch-button">Launch GUI</button>
+            <button onclick="electronAPI.closeApp()" id="close-button">Exit</button>
+        </div>
+    </div>
+</body>
+
+</html>

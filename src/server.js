@@ -26,12 +26,6 @@ console.log('Server Starting...')
   console.log('Server Starting...1')
   await sleep(500)
   console.log('Server Starting...2')
-  await sleep(500)
-  console.log('Server Starting...3')
-  await sleep(500)
-  console.log('Server Starting...4')
-  //await sleep(500)
-  //console.log('Server Starting...5')
 }
 
 // Broadcast log messages to connected GUI clients
@@ -75,6 +69,12 @@ wss.on('connection', (ws) => {
         ws.isGUI = true
         console.log('GUI Client connected');
         ws.send(JSON.stringify({ type: 'status', connected: true }))
+
+        broadcastToGUI({
+          raw: { type: 'gui_status', connected: true },
+          logMessage: '[Server] GUI connected',
+          logtype: 'log-gui',
+        })
 
         //ws.send(JSON.stringify({ raw: { type: 'companion_status', connected: true } }))
 
@@ -186,6 +186,13 @@ wss.on('connection', (ws) => {
     if (ws.isGUI) {
       guiClients.delete(ws);
       console.log('GUI Client disconnected')
+
+      broadcastToGUI({
+        raw: { type: 'gui_status', connected: false },
+        logMessage: '[Server] GUI disconnected',
+        logtype: 'log-gui',
+      })
+
     }
     else {
       console.log('Companion Client disconnected')

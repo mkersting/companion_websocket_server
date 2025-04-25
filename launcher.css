@@ -1,0 +1,141 @@
+.drag-region {
+    -webkit-app-region: drag;
+    user-select: none;
+}
+
+.title {
+    text-align: center;
+    margin-top: 20px;
+    color: white;
+    font-size: 1.4em;
+}
+
+html,
+body {
+    margin: 0;
+}
+
+body {
+    display: flex;
+    height: 100vh;
+    flex-direction: column;
+    justify-content: space-between;
+    font-family: sans-serif;
+    background: #202020;
+    color: white;
+    -webkit-app-region: drag;
+    user-select: none;
+}
+
+h1 {
+    font-size: 1.2rem;
+}
+
+.main-content {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    padding: 20px;
+}
+
+.status {
+    margin-top: 1rem;
+    font-size: 0.9rem;
+}
+
+.status span {
+    display: inline-block;
+    margin-left: 0.5rem;
+    font-weight: bold;
+}
+
+.connected {
+    color: #4caf50 !important;
+}
+
+.disconnected {
+    color: #f44336 !important;
+}
+
+button {
+    margin-top: 1rem;
+    padding: 0.5rem 1rem;
+    font-size: 0.9rem;
+    cursor: pointer;
+}
+
+.logo-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-top: 30px;
+}
+
+.logo-background {
+    background-color: black;
+    border-radius: 10px;
+    padding: 20px;
+}
+
+.logo-image {
+    width: 150px;
+    height: auto;
+    display: block;
+}
+
+.connection-block {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin-top: 20px;
+}
+
+.status-text {
+    font-size: 16px;
+    margin: 4px 0;
+}
+
+
+.status-grid {
+    display: grid;
+    grid-template-columns: auto auto;
+    gap: 6px 12px;
+    justify-content: center;
+    align-items: center;
+    margin-top: 25px;
+}
+
+.status-label {
+    font-weight: bold;
+    text-align: left;
+    color: white;
+}
+
+.status-value {
+    text-align: left;
+    color: lightgray;
+}
+
+.product-link {
+    text-align: center;
+    margin-top: 10px;
+}
+
+.product-link a {
+    color: #aaa;
+    font-size: 0.9em;
+    text-decoration: underline;
+}
+
+button,
+input,
+.no-drag {
+    -webkit-app-region: no-drag;
+}
+
+.bottom-buttons {
+    display: flex;
+    justify-content: space-between;
+    margin-top: auto;
+}

@@ -11,7 +11,63 @@ const treeKill = require('tree-kill')   // Required for killing the server proce
 // Init
 let serverProcess = null
 let guiServerProcess = null
+let electronProcess = null
 let isRestarting = false
+
+// Electron process
+function startElectronApp() {
+	if (electronProcess) return
+
+	console.log('[Watcher] Launching Electron app...')
+	electronProcess = spawn('npx', ['electron', 'main.js'], {
+		stdio: 'inherit',
+		shell: true,
+	})
+
+	electronProcess.on('exit', (code) => {
+		console.log(`[Watcher] Electron exited with code ${code}`)
+		electronProcess = null
+	})
+}
+
+function restartElectronApp() {
+    if (!electronProcess) return
+  
+    console.log('[Watcher] Killing Electron app...')
+  
+    treeKill(electronProcess.pid, 'SIGTERM', (err) => {
+      if (err) {
+        console.error('[Watcher] Failed to kill Electron app:', err)
+      } else {
+        console.log('[Watcher] Electron closed')
+        electronProcess = null
+  
+        console.log('[Watcher] Restarting Electron app...')
+        startElectronApp()
+      }
+    })
+  }
+
+// Function to restart the Electron app gracefully
+//function restartElectronApp() {
+//	if (!electronProcess) return
+//
+//	console.log('[Watcher] Killing Electron app...')
+//
+//	isRestarting = true
+//
+//	electronProcess.once('exit', () => {
+//		console.log('[Watcher] Electron closed')
+//		isRestarting = false
+//
+//		setTimeout(() => {
+//			console.log('[Watcher] Restarting Electron app...')
+//			startElectronApp()
+//		}, 1000)
+//	})
+//
+//	electronProcess.kill()
+//}
 
 
 // Function to check if a port is free
@@ -33,11 +89,11 @@ function waitForPortFree(port, callback) {
 // Function to start the server
 function startServer() {
 	if (serverProcess) {
-        console.log('[Watcher] Server is already running.')
+        console.log('[Watcher] Server is already running.\n')
         return
     }
 
-	console.log('Server Starting...')
+	console.log('[Watcher] Server Starting...')
 	serverProcess = spawn('node', [path.join(__dirname, 'server.js')], {
         stdio: 'inherit',
         shell: true,
@@ -49,7 +105,7 @@ function startServer() {
 function restartServerGracefully() {
 	if (!serverProcess) return
 
-	console.log('[Watcher] Killing server...')
+	console.log('[Watcher] Killing server...\n')
 	isRestarting = true
 
 	serverProcess.once('exit', (code) => {
@@ -85,35 +141,56 @@ function startGuiServer() {
     })
   
     guiServerProcess.on('exit', (code) => {
-      console.log(`[Watcher] GUI server exited with code ${code}`)
+      console.log(`[Watcher] GUI server exited with code ${code} \n`)
       guiServerProcess = null
     })
   }
 
 
 
-//ACTUAL CODE STARTS HERE
+// Watchers
 
 // Watch all source files except GUI files
-//const watcher = chokidar.watch(['./src/**/*.js'], {
-    const watcher = chokidar.watch(`${__dirname}`, {
-  ignored: ['src/gui-server.js', 'src/watcher.js', '/node_modules/'],
-  ignoreInitial: true,
+const serverWatcher = chokidar.watch([
+	path.join(__dirname, 'server.js'),
+	path.join(__dirname, 'parser.js'),
+	path.join(__dirname, 'rs232-builder.js'),
+	path.join(__dirname, 'simulator.js'),
+], {
+	ignoreInitial: true,
 })
 
 // Event listener for file changes
-watcher.on('change', (path) => {
-  console.log(`[Watcher] File changed: ${path}`)
-  restartServerGracefully()
+serverWatcher.on('change', (filePath) => {
+	console.log(`[Watcher] Server File changed: ${filePath}`)
+	restartServerGracefully()
 })
 
 
+// GUI Watcher (for GUI server + frontend files)
+const guiWatcher = chokidar.watch([
+	path.join(__dirname, 'gui-server.js'),
+    path.join(__dirname, '../main.js'),
+	path.join(__dirname, '../launcher.html'),
+    path.join(__dirname, '../launcher.css'),
+	path.join(__dirname, '../preload.js'),
+	path.join(__dirname, '../public'), // optional, if used
+], {
+	ignoreInitial: true,
+})
+
+guiWatcher.on('change', (filePath) => {
+	console.log(`[Watcher] GUI File changed: ${filePath}`)
+	restartElectronApp()
+})
 
 
-// Event listener for file addition
-console.log('[Watcher] Watching for changes...')
+//Start Everything up
+console.log('[Watcher] Watching for changes...\n')
 
 // Actually Start the Server
 startServer()
 // Start the GUI server
 startGuiServer()
+// Start the Electron app
+startElectronApp()

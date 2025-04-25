@@ -1,11 +1,11 @@
 {
   "name": "companion_websocket_server",
   "version": "1.0.0",
-  "main": "main.js",
+  "main": "node src/watcher.js",
   "scripts": {
-    "start": "electron electron-main.js",
+    "start": "node src/watcher.js",
     "test": "echo \"Error: no test specified\"",
-    "dev": "node src/watcher.js"
+    "electron": "electron main.js"
   },
   "keywords": [],
   "author": "",
