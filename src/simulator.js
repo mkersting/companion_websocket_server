@@ -24,15 +24,31 @@ function simulateDeviceResponse(requestBuffer) {
 
 		// Bytes 7–11 are already 0x00
 
-		// Checksum over bytes 0–11
-		let sum = 0
-		for (let i = 0; i < 12; i++) {
-			sum += response[i]
-		}
+		//Calculate Checksum
 		response[12] = calculateChecksum(response)
 
 		return response
 	}
+
+	//Connect Handshake
+	else if (requestBuffer[2] === 0x01 && requestBuffer[3] === 0x0B) {
+
+		response[2] = 0x01 // Echo command
+		response[3] = 0x0B //Connect Handshake
+		response[4] = 0x00
+		response[5] = 0x00
+		response[6] = 0xFF // I'm here!
+		response[7] = 0x00
+		response[8] = 0x00
+		response[9] = 0x00
+		response[10] = 0x00
+		response[11] = 0x00
+		response[12] = calculateChecksum(response)
+
+		return response
+	}
+
+
 
 	else if (requestBuffer[2] === 0x02) {
 

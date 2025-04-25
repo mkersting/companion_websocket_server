@@ -22,6 +22,20 @@ function buildRs232Message({ command, input, output, port, direction }) {
 		message[4] = port // You said 01 = output 1
 	}
 
+	else if(command === 'connect'){
+		message[2] = 0x01 //Connect Handshake
+		message[3] = 0x0B //Connect Handshake
+		message[4] = 0x00
+		message[5] = 0x00
+		message[6] = 0x00 // Hello Are you there? (not evaluated in simulator)
+		message[7] = 0x00
+		message[8] = 0x00
+		message[9] = 0x00
+		message[10] = 0x00			
+		message[11] = 0x00
+
+		}
+
     // Calculate checksum: naive version = 0xFF - sum of bytes 0–11
 	message[12] = calculateChecksum(message)
 

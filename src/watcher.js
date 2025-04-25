@@ -170,6 +170,7 @@ serverWatcher.on('change', (filePath) => {
 // GUI Watcher (for GUI server + frontend files)
 const guiWatcher = chokidar.watch([
 	path.join(__dirname, 'gui-server.js'),
+    path.join(__dirname, 'electron-bridge.js'),
     path.join(__dirname, '../main.js'),
 	path.join(__dirname, '../launcher.html'),
     path.join(__dirname, '../launcher.css'),

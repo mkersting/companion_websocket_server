@@ -1,4 +1,5 @@
 const WebSocket = require('ws');
+const { notifyElectron } = require('./electron-bridge') // Import the Electron bridge to communicate with the Electron app
 const parser = require('./parser'); // Import the parser module to parse RS232 Answers from Device
 const { buildRs232Message } = require('./rs232-builder') // Import the RS232 message builder 
 
@@ -14,7 +15,8 @@ const guiClients = new Set()
 // For Companion configuration
 const companionClients = new Set()
 
-let isCompanionConnected = false
+global.isCompanionConnected = false
+global.isGuiConnected = false
 
 function sleep(ms) {
   return new Promise(resolve => setTimeout(resolve, ms))
@@ -24,8 +26,8 @@ async function startupSequence() {
 console.log('Server Starting...')
   await sleep(500)
   console.log('Server Starting...1')
-  await sleep(500)
-  console.log('Server Starting...2')
+  //await sleep(500)
+  //console.log('Server Starting...2')
 }
 
 // Broadcast log messages to connected GUI clients
@@ -43,12 +45,13 @@ function broadcastToGUI({ logMessage, logtype = 'log-debug', raw = null }) {
   }
 }
 
+
 async function main() {
   await startupSequence()
+console.log('Startup...1...2...3')
 
-  console.log('Startup...1')
-console.log('Startup...2')
-console.log('Startup...3')
+//notifyElectron('companion_status', isCompanionConnected)
+//notifyElectron('gui_status', isGuiConnected)
 
 // Create WebSocket server
 const wss = new WebSocket.Server({ port: 15809 });
@@ -68,13 +71,12 @@ wss.on('connection', (ws) => {
         guiClients.add(ws)
         ws.isGUI = true
         console.log('GUI Client connected');
-        ws.send(JSON.stringify({ type: 'status', connected: true }))
 
-        broadcastToGUI({
-          raw: { type: 'gui_status', connected: true },
-          logMessage: '[Server] GUI connected',
-          logtype: 'log-gui',
-        })
+        ws.send(JSON.stringify({ type: 'status', connected: true }))
+        isGuiConnected = true
+        notifyElectron('gui_status', isGuiConnected)
+        
+
 
         //ws.send(JSON.stringify({ raw: { type: 'companion_status', connected: true } }))
 
@@ -82,6 +84,7 @@ wss.on('connection', (ws) => {
         const isCompanionConnected = companionClients.size > 0
         //console.log(isCompanionConnected);
         broadcastToGUI({ raw: { type: 'companion_status', connected: isCompanionConnected } })
+        notifyElectron('companion_status', isCompanionConnected)
 
         return
       }
@@ -96,7 +99,7 @@ wss.on('connection', (ws) => {
         ws.isGUI = false
         isCompanionConnected = true
         broadcastToGUI({ raw: { type: 'companion_status', connected: isCompanionConnected } })
-
+        notifyElectron('companion_status', true)
       }
       else {
         console.log('Unknown Client connected');
@@ -120,6 +123,7 @@ wss.on('connection', (ws) => {
         const hexFormatted = Array.from(rs232)
           .map(byte => byte.toString(16).padStart(2, '0').toUpperCase())
           .join(' ')
+          
         broadcastToGUI({ logMessage: `Constructed RS232 Message: ${hexFormatted}`, logtype: 'log-to-rs232' })
 
         //Log message
@@ -185,13 +189,10 @@ wss.on('connection', (ws) => {
 
     if (ws.isGUI) {
       guiClients.delete(ws);
+      isGuiConnected = false
       console.log('GUI Client disconnected')
-
-      broadcastToGUI({
-        raw: { type: 'gui_status', connected: false },
-        logMessage: '[Server] GUI disconnected',
-        logtype: 'log-gui',
-      })
+      notifyElectron('gui_status', isGuiConnected)
+      
 
     }
     else {
@@ -200,6 +201,7 @@ wss.on('connection', (ws) => {
       companionClients.delete(ws)
       //broadcastToGUI({ logMessage: '[Server] Companion Disconnected', logtype: 'log-gui' })
       broadcastToGUI({ raw: { type: 'companion_status', connected: isCompanionConnected } })
+      notifyElectron('companion_status', isCompanionConnected)
     }
 
 
@@ -207,11 +209,12 @@ wss.on('connection', (ws) => {
 
   ws.on('error', (err) => {
     console.error('WebSocket error:', err.message);
-
-
   });
 });
 
+// report Status
+notifyElectron('companion_status', isCompanionConnected)
+notifyElectron('gui_status', isGuiConnected)
 console.log('WebSocket server running on ws://localhost:15809');
 
 }

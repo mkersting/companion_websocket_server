@@ -1,4 +1,5 @@
 <!-- // // launcher.html (used for the Electron launcher window) //-->
+ <!-- PRODUCT URL: https://www.lindy.de/4x4-HDMI-4K30-Matrix.htm?websale8=ld0101.ld011101&pi=38152 -->
 <!DOCTYPE html>
 <html lang="en">
 
@@ -23,14 +24,33 @@
 </script>
 
 <script>
-window.electronAPI.updateStatus((_event, data) => {
-  const el = document.getElementById(`${data.type}-status`)
-  el.textContent = data.connected ? 'Connected' : 'Disconnected'
-  el.classList.remove('connected', 'disconnected')
-  el.classList.add(data.connected ? 'connected' : 'disconnected')
-})
+    function updateStatus(target, isConnected) {
+        const el = document.getElementById(`${target}-status`);
+        if (!el) return;
+    
+        el.textContent = isConnected ? 'Connected' : 'Disconnected';
+        el.classList.remove('connected', 'disconnected');
+        el.classList.add(isConnected ? 'connected' : 'disconnected');
+    }
+    </script>
+
+<script>
+const bridge = new WebSocket('ws://localhost:15999')
+
+bridge.onmessage = (event) => {
+	const { type, data } = JSON.parse(event.data)
+
+	if (type === 'companion_status') {
+		updateStatus('companion', data)
+	}
+	else if (type === 'gui_status') {
+		updateStatus('gui', data)
+	}
+}
+
 
 </script>
+
 <!-- Script END-->
 
 </head>

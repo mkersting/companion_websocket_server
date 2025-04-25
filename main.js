@@ -76,6 +76,14 @@ app.whenReady().then(() => {
     ipcMain.on('launch-gui', () => {
         require('electron').shell.openExternal('http://localhost:3000')
     })
+
+    //ipcMain.on('gui-status-request', (event) => {
+    //    const win = BrowserWindow.getAllWindows()[0]
+    //    if (win) {
+    //      win.webContents.send('gui_status', { connected: true }) // or use actual value
+    //    }
+    //  })
+
 })
 
 
