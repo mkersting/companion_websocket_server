@@ -58,6 +58,14 @@ h1 {
     color: #f44336 !important;
 }
 
+.dotconnected {
+    background-color: #4caf50 !important;
+}
+
+.dotdisconnected {
+    background-color: #f44336 !important;
+}
+
 button {
     margin-top: 1rem;
     padding: 0.5rem 1rem;
@@ -110,11 +118,18 @@ button {
     font-weight: bold;
     text-align: left;
     color: white;
+    height:22px;
+    margin-top: auto;
+    line-height: 22px;
 }
 
 .status-value {
     text-align: left;
     color: lightgray;
+    min-width: 98px;
+    height:22px;
+    margin-top: auto;
+    line-height: 22px;
 }
 
 .product-link {
@@ -139,3 +154,18 @@ input,
     justify-content: space-between;
     margin-top: auto;
 }
+
+.dot-row {
+    display: flex;
+    justify-content: center;
+    
+    gap: 15px;
+  }
+  
+  .status-dot {
+    width: 20px;
+    height: 20px;
+    background-color: orange; /* Unknown at first */
+    border-radius: 50%;
+    border: 1px solid black;
+  }

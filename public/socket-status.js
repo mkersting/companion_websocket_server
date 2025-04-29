@@ -25,6 +25,40 @@ function setStatus(connected) {
     statusEl.classList.add(connected ? 'connected' : 'disconnected')
 }
 
+function updateDeviceStatus(deviceType, connected) {
+	const el = document.getElementById(`${deviceType}-status`)
+    if (!el) return // Exit if the element doesn't exist
+
+    switch (deviceType)
+    {
+        case 'companion':
+            device = 'Companion'
+            el.textContent = device + (connected ? ' Connected' : ' Disconnected')
+            break;
+        case 'rs232':
+            device = 'RS232'
+            el.textContent = device + (connected ? ' Connected' : ' Disconnected')
+            break;
+        case 'input1':
+        case 'input2':
+        case 'input3':
+        case 'input4':
+        case 'output1':
+        case 'output2':
+        case 'output3':
+        case 'output4':
+            device = deviceType
+            break;
+        default:
+            device = 'unknown'
+
+    }
+    
+		//el.textContent = device + (connected ? ' Connected' : ' Disconnected')
+		el.classList.remove('connected', 'disconnected')
+		el.classList.add(connected ? 'connected' : 'disconnected')
+	}
+
 // Connect to your own WebSocket server (adjust port if needed)
 
 let guiSocket = null;
@@ -57,13 +91,9 @@ function connectToServer() {
         setStatus(false)
         appendLog(`[${new Date().toLocaleTimeString()}] [GUI] WebSocket connection closed.`, 'log-gui')
         statusEl.textContent = 'GUI DISCONNECTED';
-
-        // Update Companion connection status visually
-        const companionStatusEl = document.getElementById('companion-status')
-        companionStatusEl.textContent = 'Companion Disconnected'
-        companionStatusEl.classList.remove('connected', 'disconnected')
-        companionStatusEl.classList.add('disconnected')
-
+        // Update connection status visually
+        updateDeviceStatus('companion', false)  
+        updateDeviceStatus('rs232', false)
     }
 
     guiSocket.onerror = (err) => {
@@ -89,14 +119,19 @@ function connectToServer() {
             updateStatus(data.connected);
         }
         else if (data.type === 'companion_status') {
-            const el = document.getElementById('companion-status');
-            el.textContent = data.connected ? 'Companion Connected' : 'Companion Disconnected';
-            el.classList.remove('connected', 'disconnected')
-            el.classList.add(data.connected ? 'connected' : 'disconnected')
+            updateDeviceStatus('companion', data.connected)
 
             const time = new Date().toLocaleTimeString();
             appendLog(`[${time}] [Server] Companion ${data.connected ? 'connected' : 'disconnected'}.`, 'log-gui');
         }
+        else if (data.type === 'rs232_status') {
+            updateDeviceStatus('rs232', data.connected)
+        
+            const time = new Date().toLocaleTimeString()
+            appendLog(`[${time}] [Server] RS232 ${data.connected ? 'connected' : 'disconnected'}.`, 'log-gui')
+        }
+
+
     }
 }
 

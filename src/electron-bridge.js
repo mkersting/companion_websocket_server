@@ -14,11 +14,14 @@ bridgeWS.on('connection', (ws) => {
 	// Immediately send current status on new connection
 	ws.send(JSON.stringify({ type: 'companion_status', data: global.isCompanionConnected }))
 	ws.send(JSON.stringify({ type: 'gui_status', data: global.isGuiConnected }))
+    ws.send(JSON.stringify({ type: 'rs232_status', data: global.isRs232Connected }))
 
 	ws.on('close', () => {
 		electronClients.delete(ws)
 		console.log('[Bridge] Electron disconnected')
 	})
+
+
 })
 
 function notifyElectron(type, data) {

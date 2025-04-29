@@ -26,10 +26,19 @@ function parseStatusMessage(buffer) {
 	// Special handling for switch_ack
 	if (Command === 'switch_ack') {
 		const output = buffer[3]
-		
+
 		return {
 			feedback: Command,
 			output,
+		}
+	}
+
+	if (buffer[2] == 0x01 && buffer[3] == 0x0B) {
+		const handshakeStatus = buffer[6] // Byte 7
+		const connected = handshakeStatus !== 0xFF
+		return {
+			feedback: 'connect_ack',
+			connected: connected,
 		}
 	}
 
@@ -51,9 +60,6 @@ function parseStatusMessage(buffer) {
 		connected: statusconnected,
 		rawStatus: statusByte
 	}
-
-
-
 }
 
 module.exports = {

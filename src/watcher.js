@@ -164,6 +164,7 @@ const serverWatcher = chokidar.watch([
 serverWatcher.on('change', (filePath) => {
 	console.log(`[Watcher] Server File changed: ${filePath}`)
 	restartServerGracefully()
+    restartElectronApp()
 })
 
 

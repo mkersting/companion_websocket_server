@@ -35,10 +35,23 @@
     </script>
 
 <script>
+    function updateDotStatus(target, isConnected) {
+        const el = document.getElementById(`${target}-status`);
+        if (!el) return;
+    
+        el.classList.remove('dotconnected', 'dotdisconnected');
+        el.classList.add(isConnected ? 'dotconnected' : 'dotdisconnected');
+    }
+    </script>
+
+<!-- Script to receive status messages from the WebSocket server -->
+<script>
 const bridge = new WebSocket('ws://localhost:15999')
 
 bridge.onmessage = (event) => {
 	const { type, data } = JSON.parse(event.data)
+
+    console.log('Received message:', type, data)
 
 	if (type === 'companion_status') {
 		updateStatus('companion', data)
@@ -46,6 +59,15 @@ bridge.onmessage = (event) => {
 	else if (type === 'gui_status') {
 		updateStatus('gui', data)
 	}
+    else if (type === 'rs232_status') {
+        updateStatus('rs232', data)
+    }
+    else if (type === 'input_status' || type === 'output_status') {
+        console.log('Received input/output status:', data)  
+		  const deviceId = `${type.startsWith('input') ? 'input' : 'output'}${data.port}`
+		  updateDotStatus(deviceId, data.connected)
+		}
+
 }
 
 
@@ -73,7 +95,28 @@ bridge.onmessage = (event) => {
 
             <div class="status-label">RS232:</div>
             <div id="rs232-status" class="status-value">Disconnected</div>
+
+           
+            <div class="status-label">Inputs:</div>
+            <div class="dot-row">
+                <div id="input1-status" class="status-dot"></div>
+                <div id="input2-status" class="status-dot"></div>
+                <div id="input3-status" class="status-dot"></div>
+                <div id="input4-status" class="status-dot"></div>
+              </div>
+              
+              <div class="status-label">Outputs:</div> 
+              <div class="dot-row">
+                
+                <div id="output1-status" class="status-dot"></div>
+                <div id="output2-status" class="status-dot"></div>
+                <div id="output3-status" class="status-dot"></div>
+                <div id="output4-status" class="status-dot"></div>
+              </div>
         </div>
+       
+
+        
 
         <div class="product-link">
             <a href="https://www.lindy-international.com/" target="_blank">Visit Lindy Website</a>
